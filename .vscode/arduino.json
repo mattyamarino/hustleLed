@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "port": "COM4",
-    "sketch": "solid_color.ino"
+    "sketch": "solid_color.ino",
+    "programmer": "arduino:avrisp"
 }
