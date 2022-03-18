@@ -5,7 +5,7 @@
 int buttonApin = 9;//one button  to pin 9 on the Arduino
 
 // Information about the LED strip itself
-#define NUM_LEDS    50
+#define NUM_LEDS    86
 #define CHIPSET     WS2811
 #define COLOR_ORDER RGB
 
@@ -52,29 +52,26 @@ void setup() {
   FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS_ARRAY[BRIGHTNESS_INDEX]);
 
-
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
 }
 
 void loop() {
-//  while (!irrecv.isIdle()) {
-//   
-//  }
-
+  while (!irrecv.isIdle()) { // pauses loop while ir input is being recieved
+  }
 
   if (irrecv.decode(&results)){ // have we received an IR signal?
     translateIR(); 
     irrecv.resume(); // receive the next value
-    
   }  
 
   if (digitalRead(buttonApin) == LOW){
     turnOnOff();
     delay(500);
   }
-
 }
+
+//*********** REMOTE CONTROL FUNCTIONS ***********
 
 void turnOnOff() {
   if (ON == false)
@@ -116,6 +113,37 @@ void setRainbow() {
   FastLED.show(); 
 }
 
+void setCylon() {
+  static uint8_t hue = 0;
+	// First slide the led in one direction
+	for(int i = 0; i < 25; i++) {
+		// Set the i'th led to red 
+		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
+
+		// Show the leds
+		FastLED.show(); 
+		// now that we've shown the leds, reset the i'th led to black
+		// leds[i] = CRGB::Black;
+		fadeall();
+		// Wait a little bit before we loop around and do it again
+		delay(10);
+	}
+	Serial.print("x");
+
+	// Now go in the other direction.  
+	for(int i = (25)-1; i >= 0; i--) {
+		// Set the i'th led to red 
+		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
+		// Show the leds
+		FastLED.show();
+		// now that we've shown the leds, reset the i'th led to black
+		// leds[i] = CRGB::Black;
+		fadeall();
+		// Wait a little bit before we loop around and do it again
+		delay(10);
+	}
+}
+
 void increaseBrightness() {
   if(BRIGHTNESS_INDEX < 4) {
     BRIGHTNESS_INDEX++;
@@ -133,11 +161,7 @@ void decreaseBrightness() {
 }
 
 void translateIR(){
-  Serial.println("VALUE = ");
-  Serial.println(results.value);
-  switch(results.value)
-
-  {
+  switch(results.value) {
   case 0xFFA25D: Serial.println("POWER"); turnOnOff(); break;
   case 0xFFE21D: Serial.println("VOL STOP");  break;
   case 0xFF629D: Serial.println("MODE");  break;
@@ -155,7 +179,7 @@ void translateIR(){
   case 0xFF7A85: Serial.println("3");   setSolidTeal(); break;
   case 0xFF10EF: Serial.println("4");    break;
   case 0xFF38C7: Serial.println("5");   setRainbow(); break;
-  case 0xFF5AA5: Serial.println("6");    break;
+  case 0xFF5AA5: Serial.println("6");   setCylon(); break;
   case 0xFF42BD: Serial.println("7");    break;
   case 0xFF4AB5: Serial.println("8");    break;
   case 0xFF52AD: Serial.println("9");    break;
@@ -169,8 +193,10 @@ void translateIR(){
   delay(350); // Do not get immediate repeat
 }
 
-void convertPatternHorizontal() {
 
+//*********** MAPPING FUNCTIONS ***********
+
+void convertPatternHorizontal() {
 
   updateLeds(h0, 8, 0);
   updateLeds(h1, 1, 1);
@@ -184,22 +210,51 @@ void convertPatternHorizontal() {
   updateLeds(h9, 3, 9);
   updateLeds(h10, 2, 10);
   updateLeds(h11, 3, 11);
-  // updateLeds(h12, 1, 12);
-  // updateLeds(h13, 1, 13);
-  // updateLeds(h14, 8, 14);
-  // updateLeds(h15, 1, 15);
-  // updateLeds(h16, 1, 16);
-  // updateLeds(h17, 8, 17);
-  // updateLeds(h18, 1, 18);
-  // updateLeds(h19, 1, 19);
-  // updateLeds(h20, 1, 20);
-  // updateLeds(h21, 9, 21);
-  // updateLeds(h22, 3, 22);
-  // updateLeds(h23, 3, 23);
-  // updateLeds(h24, 3, 24);
+  updateLeds(h12, 1, 12);
+  updateLeds(h13, 1, 13);
+  updateLeds(h14, 8, 14);
+  updateLeds(h15, 1, 15);
+  updateLeds(h16, 1, 16);
+  updateLeds(h17, 8, 17);
+  updateLeds(h18, 1, 18);
+  updateLeds(h19, 1, 19);
+  updateLeds(h20, 1, 20);
+  updateLeds(h21, 9, 21);
+  updateLeds(h22, 3, 22);
+  updateLeds(h23, 3, 23);
+  updateLeds(h24, 3, 24);
+}
 
+void convertIndividualColumn(int index) {
+  switch(index) {
+  case 0:  updateLeds(h0, 8, 0);   break;
+  case 1:  updateLeds(h1, 1, 1);   break;
+  case 2:  updateLeds(h2, 8, 2);   break;
+  case 3:  updateLeds(h3, 7, 3);   break;
+  case 4:  updateLeds(h4, 1, 4);   break;
+  case 5:  updateLeds(h5, 1, 5);   break;
+  case 6:  updateLeds(h6, 7, 6);   break;
+  case 7:  updateLeds(h7, 2, 7);   break;
+  case 8:  updateLeds(h8, 2, 8);   break;
+  case 9:  updateLeds(h9, 3, 9);   break;
+  case 10: updateLeds(h10, 2, 10); break;
+  case 11: updateLeds(h11, 3, 11); break;
+  case 12: updateLeds(h12, 1, 12); break;
+  case 13: updateLeds(h13, 1, 13); break;
+  case 14: updateLeds(h14, 8, 14); break;
+  case 15: updateLeds(h15, 1, 15); break;
+  case 16: updateLeds(h16, 1, 16); break;
+  case 17: updateLeds(h17, 8, 17); break;
+  case 18: updateLeds(h18, 1, 18); break;
+  case 19: updateLeds(h19, 1, 19); break;
+  case 20: updateLeds(h20, 1, 20); break;
+  case 21: updateLeds(h21, 9, 21); break;
+  case 22: updateLeds(h22, 3, 22); break;
+  case 23: updateLeds(h23, 3, 23); break;
+  case 24: updateLeds(h24, 3, 24); break;
 
-  FastLED.show(); 
+  default:
+    Serial.println(" ERROR: convertColumnHorizontal failed ");
 }
 
 void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex) {
@@ -211,3 +266,8 @@ void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex) {
 
   }
 }
+
+// *********** ANIMATION FUNCTIONS ***********
+// CYLON
+void fadeall() { for(int i = 0; i < 25; i++) { dummyLedsHorizontal[i].nscale8(250); } }
+
