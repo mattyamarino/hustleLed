@@ -52,10 +52,6 @@ void setup() {
   FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS_ARRAY[BRIGHTNESS_INDEX]);
 
-// Set up dummy leds, data pin not actually used
-  FastLED.addLeds<WS2812B, 1, RGB>(dummyLedsHorizontal, 25);
-
-
 
   Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
@@ -114,8 +110,9 @@ void setSolidTeal() {
 }
 
 void setRainbow() {
-  fill_rainbow(leds, NUM_LEDS, 0, 255/NUM_LEDS);
-  ON = true;      
+  fill_rainbow(dummyLedsHorizontal, 25, 0, 255/NUM_LEDS);
+  ON = true;
+  convertPatternHorizontal(); 
   FastLED.show(); 
 }
 
@@ -152,7 +149,7 @@ void translateIR(){
   case 0xFF906F: Serial.println("VOL+"); increaseBrightness();    break;
   case 0xFF9867: Serial.println("RETURN");    break;
   case 0xFFB04F: Serial.println("USB SCAN");    break;
-  case 0xFF6897: Serial.println("0");   convertPatternHorizontal(); break;
+  case 0xFF6897: Serial.println("0");    break;
   case 0xFF30CF: Serial.println("1");   setSolidBlue(); break;
   case 0xFF18E7: Serial.println("2");   setSolidOrange(); break;
   case 0xFF7A85: Serial.println("3");   setSolidTeal(); break;
@@ -173,55 +170,44 @@ void translateIR(){
 }
 
 void convertPatternHorizontal() {
-  fill_rainbow(dummyLedsHorizontal, 25, 0, 255/NUM_LEDS);
-  ON = true;
-
 
 
   updateLeds(h0, 8, 0);
-  updateLeds(h1, 1, 10);
-  updateLeds(h2, 8, 20);
+  updateLeds(h1, 1, 1);
+  updateLeds(h2, 8, 2);
+  updateLeds(h3, 7, 3);
+  updateLeds(h4, 1, 4);
+  updateLeds(h5, 1, 5);
+  updateLeds(h6, 7, 6);
+  updateLeds(h7, 2, 7);
+  updateLeds(h8, 2, 8);
+  updateLeds(h9, 3, 9);
+  updateLeds(h10, 2, 10);
+  updateLeds(h11, 3, 11);
+  // updateLeds(h12, 1, 12);
+  // updateLeds(h13, 1, 13);
+  // updateLeds(h14, 8, 14);
+  // updateLeds(h15, 1, 15);
+  // updateLeds(h16, 1, 16);
+  // updateLeds(h17, 8, 17);
+  // updateLeds(h18, 1, 18);
+  // updateLeds(h19, 1, 19);
+  // updateLeds(h20, 1, 20);
+  // updateLeds(h21, 9, 21);
+  // updateLeds(h22, 3, 22);
+  // updateLeds(h23, 3, 23);
+  // updateLeds(h24, 3, 24);
+
+
   FastLED.show(); 
 }
 
 void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex) {
-  // CRGB colorToSet = CRGB(leds[dummyLedIndex].r,leds[dummyLedIndex].g,leds[dummyLedIndex].b);
-  int redToSet = dummyLedsHorizontal[dummyLedIndex].r;
-  int blueToSet = dummyLedsHorizontal[dummyLedIndex].b;
-  int greenToSet = dummyLedsHorizontal[dummyLedIndex].g;
-
-    Serial.print("DUMMY LEDS R VALUE ")   ;   
-                Serial.print(redToSet);
-        Serial.print(",  ");
-                        Serial.print(blueToSet);
-        Serial.print(",  ");
-                        Serial.print(greenToSet);
-        Serial.print(",  ");
-                        Serial.println("   ");
-                                                Serial.println(" ****************  ");
-
-                                                Serial.println("   ");
-
-
-  Serial.println(dummyLedsHorizontal[dummyLedIndex].r)   ;   
+  CRGB colorToSet = CRGB(dummyLedsHorizontal[dummyLedIndex].r,dummyLedsHorizontal[dummyLedIndex].g,dummyLedsHorizontal[dummyLedIndex].b);
 
   for(int i =0; i < pixelGroupSize; i++) {
-         Serial.print("MAP VALUE ");
-         Serial.print(i);
-        Serial.print(",  ");
-
-        Serial.println(pixelGroup[i]);
-
-
-
-      leds[pixelGroup[i]].red = redToSet;
-      leds[pixelGroup[i]].blue = blueToSet;
-      leds[pixelGroup[i]].green = greenToSet;
-
-      Serial.print("LED RED VALUE ");
-      Serial.println(leds[pixelGroup[i]].r);                 
-
-        
+      
+      leds[pixelGroup[i]] = colorToSet;
 
   }
 }
