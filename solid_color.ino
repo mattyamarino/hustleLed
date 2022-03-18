@@ -19,32 +19,6 @@ int BRIGHTNESS_ARRAY[] = {10, 45, 80, 150, 250};
 CRGB leds[NUM_LEDS];
 CRGB dummyLedsHorizontal[25];
 
-//LEFT TO RIGHT LETTER MAP
-int h0[]  = {0,1,2,3,4,5,6,7} ;
-int h1[]  = {8};
-int h2[]  = {9,10,11,12,13,14,15,16};
-int h3[]  = {17,18,19,20,21,22,23};
-int h4[]  = {24};
-int h5[]  = {25};
-int h6[]  = {26,27,28,29,30,31,32};
-int h7[]  = {36,44};
-int h8[]  = {35,37};
-int h9[]  = {34,38,43};
-int h10[] = {39,42};
-int h11[] = {33,40,41};
-int h12[] = {52};
-int h13[] = {53};
-int h14[] = {45,46,47,48,49,50,51,54};
-int h15[] = {55};
-int h16[] = {56};
-int h17[] = {57,58,59,60,61,62,63,64};
-int h18[] = {65};
-int h19[] = {66};
-int h20[] = {67};
-int h21[] = {68,69,70,71,72,73,74,75,76};
-int h22[] = {77,82,83};
-int h23[] = {78,81,84};
-int h24[] = {79,80,85};
 
 void setup() {
   pinMode(buttonApin, INPUT_PULLUP);  
@@ -69,6 +43,7 @@ void loop() {
     turnOnOff();
     delay(500);
   }
+
 }
 
 //*********** REMOTE CONTROL FUNCTIONS ***********
@@ -109,7 +84,13 @@ void setSolidTeal() {
 void setRainbow() {
   fill_rainbow(dummyLedsHorizontal, 25, 0, 255/NUM_LEDS);
   ON = true;
-  convertPatternHorizontal(); 
+  convertPatternHorizontal();
+
+
+  // fill_gradient_RGB(leds, 85, CRGB::Red, CRGB::Yellow, CRGB::Green, CRGB::Blue);
+  //   fill_rainbow(leds, 85, 0, 255/NUM_LEDS);
+  // ON = true;
+
   FastLED.show(); 
 }
 
@@ -119,14 +100,14 @@ void setCylon() {
 	for(int i = 0; i < 25; i++) {
 		// Set the i'th led to red 
 		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
-
+    convertIndividualColumn(i, false);
 		// Show the leds
 		FastLED.show(); 
 		// now that we've shown the leds, reset the i'th led to black
 		// leds[i] = CRGB::Black;
 		fadeall();
 		// Wait a little bit before we loop around and do it again
-		delay(10);
+		delay(20);
 	}
 	Serial.print("x");
 
@@ -134,13 +115,14 @@ void setCylon() {
 	for(int i = (25)-1; i >= 0; i--) {
 		// Set the i'th led to red 
 		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
+    convertIndividualColumn(i, false);
 		// Show the leds
 		FastLED.show();
 		// now that we've shown the leds, reset the i'th led to black
 		// leds[i] = CRGB::Black;
 		fadeall();
 		// Wait a little bit before we loop around and do it again
-		delay(10);
+		delay(20);
 	}
 }
 
@@ -197,77 +179,113 @@ void translateIR(){
 //*********** MAPPING FUNCTIONS ***********
 
 void convertPatternHorizontal() {
-
-  updateLeds(h0, 8, 0);
-  updateLeds(h1, 1, 1);
-  updateLeds(h2, 8, 2);
-  updateLeds(h3, 7, 3);
-  updateLeds(h4, 1, 4);
-  updateLeds(h5, 1, 5);
-  updateLeds(h6, 7, 6);
-  updateLeds(h7, 2, 7);
-  updateLeds(h8, 2, 8);
-  updateLeds(h9, 3, 9);
-  updateLeds(h10, 2, 10);
-  updateLeds(h11, 3, 11);
-  updateLeds(h12, 1, 12);
-  updateLeds(h13, 1, 13);
-  updateLeds(h14, 8, 14);
-  updateLeds(h15, 1, 15);
-  updateLeds(h16, 1, 16);
-  updateLeds(h17, 8, 17);
-  updateLeds(h18, 1, 18);
-  updateLeds(h19, 1, 19);
-  updateLeds(h20, 1, 20);
-  updateLeds(h21, 9, 21);
-  updateLeds(h22, 3, 22);
-  updateLeds(h23, 3, 23);
-  updateLeds(h24, 3, 24);
+  for(int i = 0; i < 25; i++) {
+    convertIndividualColumn(i, false);
+  }
 }
 
-void convertIndividualColumn(int index) {
+void convertIndividualColumn(int index, bool nscale) {
+  //LEFT TO RIGHT LETTER MAP
+  int h0[]  = {0,1,2,3,4,5,6,7} ;
+  int h1[]  = {8};
+  int h2[]  = {9,10,11,12,13,14,15,16};
+  int h3[]  = {17,18,19,20,21,22,23};
+  int h4[]  = {24};
+  int h5[]  = {25};
+  int h6[]  = {26,27,28,29,30,31,32};
+  int h7[]  = {36,44};
+  int h8[]  = {35,37};
+  int h9[]  = {34,38,43};
+  int h10[] = {39,42};
+  int h11[] = {33,40,41};
+  int h12[] = {52};
+  int h13[] = {53};
+  int h14[] = {45,46,47,48,49,50,51,54};
+  int h15[] = {55};
+  int h16[] = {56};
+  int h17[] = {57,58,59,60,61,62,63,64};
+  int h18[] = {65};
+  int h19[] = {66};
+  int h20[] = {67};
+  int h21[] = {68,69,70,71,72,73,74,75,76};
+  int h22[] = {77,82,83};
+  int h23[] = {78,81,84};
+  int h24[] = {79,80,85};
+
   switch(index) {
-  case 0:  updateLeds(h0, 8, 0);   break;
-  case 1:  updateLeds(h1, 1, 1);   break;
-  case 2:  updateLeds(h2, 8, 2);   break;
-  case 3:  updateLeds(h3, 7, 3);   break;
-  case 4:  updateLeds(h4, 1, 4);   break;
-  case 5:  updateLeds(h5, 1, 5);   break;
-  case 6:  updateLeds(h6, 7, 6);   break;
-  case 7:  updateLeds(h7, 2, 7);   break;
-  case 8:  updateLeds(h8, 2, 8);   break;
-  case 9:  updateLeds(h9, 3, 9);   break;
-  case 10: updateLeds(h10, 2, 10); break;
-  case 11: updateLeds(h11, 3, 11); break;
-  case 12: updateLeds(h12, 1, 12); break;
-  case 13: updateLeds(h13, 1, 13); break;
-  case 14: updateLeds(h14, 8, 14); break;
-  case 15: updateLeds(h15, 1, 15); break;
-  case 16: updateLeds(h16, 1, 16); break;
-  case 17: updateLeds(h17, 8, 17); break;
-  case 18: updateLeds(h18, 1, 18); break;
-  case 19: updateLeds(h19, 1, 19); break;
-  case 20: updateLeds(h20, 1, 20); break;
-  case 21: updateLeds(h21, 9, 21); break;
-  case 22: updateLeds(h22, 3, 22); break;
-  case 23: updateLeds(h23, 3, 23); break;
-  case 24: updateLeds(h24, 3, 24); break;
+  case 0:  
+  updateLeds(h0, 8, 0, nscale);   break;
+  case 1:  
+  updateLeds(h1, 1, 1, nscale);   break;
+  case 2:  
+  updateLeds(h2, 8, 2, nscale);   break;
+  case 3:  
+  updateLeds(h3, 7, 3, nscale);   break;
+  case 4:  
+  updateLeds(h4, 1, 4, nscale);   break;
+  case 5:  
+  updateLeds(h5, 1, 5, nscale);   break;
+  case 6:  
+  updateLeds(h6, 7, 6, nscale);   break;
+  case 7:  
+  updateLeds(h7, 2, 7, nscale);   break;
+  case 8:  
+  updateLeds(h8, 2, 8, nscale);   break;
+  case 9:  
+  updateLeds(h9, 3, 9, nscale);   break;
+  case 10: 
+  updateLeds(h10, 2, 10, nscale); break;
+  case 11: 
+  updateLeds(h11, 3, 11, nscale); break;
+  case 12: 
+  updateLeds(h12, 1, 12, nscale); break;
+  case 13: 
+  updateLeds(h13, 1, 13, nscale); break;
+  case 14: 
+  updateLeds(h14, 8, 14, nscale); break;
+  case 15: 
+  updateLeds(h15, 1, 15, nscale); break;
+  case 16: 
+  updateLeds(h16, 1, 16, nscale); break;
+  case 17: 
+  updateLeds(h17, 8, 17, nscale); break;
+  case 18: 
+  updateLeds(h18, 1, 18, nscale); break;
+  case 19: 
+  updateLeds(h19, 1, 19, nscale); break;
+  case 20: 
+  updateLeds(h20, 1, 20, nscale); break;
+  case 21: 
+  updateLeds(h21, 9, 21, nscale); break;
+  case 22: 
+  updateLeds(h22, 3, 22, nscale); break;
+  case 23: 
+  updateLeds(h23, 3, 23, nscale); break;
+  case 24: 
+  updateLeds(h24, 3, 24, nscale); break;
 
   default:
     Serial.println(" ERROR: convertColumnHorizontal failed ");
+  }
 }
 
-void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex) {
+void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex, bool nscale) {
   CRGB colorToSet = CRGB(dummyLedsHorizontal[dummyLedIndex].r,dummyLedsHorizontal[dummyLedIndex].g,dummyLedsHorizontal[dummyLedIndex].b);
 
   for(int i =0; i < pixelGroupSize; i++) {
-      
-      leds[pixelGroup[i]] = colorToSet;
-
+      if(nscale == true) {
+        leds[pixelGroup[i]].nscale8(250);
+      } else {
+        leds[pixelGroup[i]] = colorToSet;
+      }
   }
 }
 
 // *********** ANIMATION FUNCTIONS ***********
 // CYLON
-void fadeall() { for(int i = 0; i < 25; i++) { dummyLedsHorizontal[i].nscale8(250); } }
+void fadeall() { 
+  for(int i = 0; i < 25; i++) { 
+    convertIndividualColumn(i, true);
+  } 
+}
 
