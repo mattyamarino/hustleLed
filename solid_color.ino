@@ -14,6 +14,7 @@ IRrecv irrecv(receiver);     // create instance of 'irrecv'
 decode_results results;      // create instance of 'decode_results'
 
 bool ON = false;
+int ACTIVE_FUNCTION = 99;
 int BRIGHTNESS_INDEX = 2;
 int BRIGHTNESS_ARRAY[] = {10, 45, 80, 150, 250};
 CRGB leds[NUM_LEDS];
@@ -31,9 +32,6 @@ void setup() {
 }
 
 void loop() {
-  while (!irrecv.isIdle()) { // pauses loop while ir input is being recieved
-  }
-
   if (irrecv.decode(&results)){ // have we received an IR signal?
     translateIR(); 
     irrecv.resume(); // receive the next value
@@ -44,6 +42,7 @@ void loop() {
     delay(500);
   }
 
+  callActiveFunction(ACTIVE_FUNCTION);
 }
 
 //*********** REMOTE CONTROL FUNCTIONS ***********
@@ -56,6 +55,7 @@ void turnOnOff() {
       FastLED.show();
     } else if (ON == true) {
       ON = false;
+      ACTIVE_FUNCTION = 99;
       BRIGHTNESS_INDEX = 2;
       FastLED.setBrightness(BRIGHTNESS_ARRAY[BRIGHTNESS_INDEX]);
       FastLED.clear();
@@ -66,38 +66,39 @@ void turnOnOff() {
 void setSolidBlue() {
   fill_solid( leds, NUM_LEDS, CRGB::Blue);
   ON = true;
+  ACTIVE_FUNCTION = 99;
   FastLED.show();  
 }
 
 void setSolidOrange() {
   fill_solid( leds, NUM_LEDS, CRGB::Orange);
-  ON = true;      
+  ON = true;   
+  ACTIVE_FUNCTION = 99;   
   FastLED.show();  
 }
 
 void setSolidTeal() {
   fill_solid( leds, NUM_LEDS, CRGB::Teal);
-  ON = true;      
+  ON = true;  
+  ACTIVE_FUNCTION = 99;    
   FastLED.show();  
 }
 
 void setRainbow() {
-  fill_rainbow(dummyLedsHorizontal, 25, 0, 255/NUM_LEDS);
+  fill_gradient_RGB(dummyLedsHorizontal, 25, CRGB::Red, CRGB::Yellow, CRGB::Green, CRGB::Blue);
   ON = true;
+  ACTIVE_FUNCTION = 99;
   convertPatternHorizontal();
-
-
-  // fill_gradient_RGB(leds, 85, CRGB::Red, CRGB::Yellow, CRGB::Green, CRGB::Blue);
-  //   fill_rainbow(leds, 85, 0, 255/NUM_LEDS);
-  // ON = true;
-
   FastLED.show(); 
 }
 
 void setCylon() {
+  ACTIVE_FUNCTION = 6;
+  ON = true;
   static uint8_t hue = 0;
 	// First slide the led in one direction
 	for(int i = 0; i < 25; i++) {
+    pauseForIrInput();
 		// Set the i'th led to red 
 		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
     convertIndividualColumn(i, false);
@@ -109,10 +110,10 @@ void setCylon() {
 		// Wait a little bit before we loop around and do it again
 		delay(20);
 	}
-	Serial.print("x");
 
 	// Now go in the other direction.  
 	for(int i = (25)-1; i >= 0; i--) {
+    pauseForIrInput();
 		// Set the i'th led to red 
 		dummyLedsHorizontal[i] = CHSV(hue++, 255, 255);
     convertIndividualColumn(i, false);
@@ -282,6 +283,18 @@ void updateLeds(int pixelGroup[], int pixelGroupSize, int dummyLedIndex, bool ns
 }
 
 // *********** ANIMATION FUNCTIONS ***********
+void pauseForIrInput() {
+  while (!irrecv.isIdle()) { // pauses loop while ir input is being recieved
+  }
+}
+
+void callActiveFunction(int functionNumber) {
+  switch(functionNumber) {
+  case 6: setCylon(); break;
+  default: ;
+  }// End Case
+  
+}
 // CYLON
 void fadeall() { 
   for(int i = 0; i < 25; i++) { 
