@@ -84,6 +84,10 @@ void setSolidTeal() {
   FastLED.show();  
 }
 
+void setTwinkle() {
+  
+}
+
 void setRainbow() {
   fill_gradient_RGB(dummyLedsHorizontal, 25, CRGB::Red, CRGB::Yellow, CRGB::Green, CRGB::Blue);
   ON = true;
